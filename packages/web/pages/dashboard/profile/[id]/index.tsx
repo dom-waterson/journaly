@@ -16,15 +16,24 @@ const ProfilePage: NextPage<InitialProps> = () => {
   const idStr = useRouter().query.id as string
   const userId = parseInt(idStr, 10)
 
-  const { data, loading, error } = useProfilePageQuery({ variables: { userId } })
+  const { data, loading, error, fetchMore } = useProfilePageQuery({ variables: { userId, limit: 5 } })
 
   const { userById, posts, currentUser } = data || {}
+
+  function fetchMorePosts() {
+    fetchMore({
+        variables: {
+          cursor: data?.posts.cursor
+        }
+      })
+
+  }
 
   return (
     <LoadingWrapper loading={loading} error={error}>
       <DashboardLayout pad="never">
         {userById && posts && (
-          <Profile isLoggedInUser={currentUser?.id === userId} user={userById} posts={posts} />
+          <Profile isLoggedInUser={currentUser?.id === userId} user={userById} posts={posts} fetchMorePosts={fetchMorePosts} />
         )}
       </DashboardLayout>
     </LoadingWrapper>

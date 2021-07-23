@@ -181,9 +181,15 @@ const PostQueries = extendType({
       args: {
         status: arg({ type: 'PostStatus', required: true }),
         authorId: intArg({ required: true }),
+        limit: intArg({ required: true }),
       },
       resolve: async (_parent, args, ctx) => {
         return ctx.db.post.findMany({
+          take: args.limit,
+          skip: 1,
+          cursor: {
+            id: args.cursor,
+          },
           where: {
             author: { id: args.authorId },
             status: args.status,
