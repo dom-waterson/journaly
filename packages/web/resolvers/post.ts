@@ -181,15 +181,9 @@ const PostQueries = extendType({
       args: {
         status: arg({ type: 'PostStatus', required: true }),
         authorId: intArg({ required: true }),
-        limit: intArg({ required: true }),
       },
       resolve: async (_parent, args, ctx) => {
         return ctx.db.post.findMany({
-          take: args.limit,
-          skip: 1,
-          cursor: {
-            id: args.cursor,
-          },
           where: {
             author: { id: args.authorId },
             status: args.status,
@@ -198,6 +192,41 @@ const PostQueries = extendType({
             publishedAt: 'desc',
           },
         })
+      },
+    })
+
+    t.list.field('infinatePosts', {
+      type: 'Post',
+      args: {
+        status: arg({ type: 'PostStatus', required: true }),
+        authorId: intArg({ required: true }),
+        limit: intArg({required: true}),
+        cursor: intArg({required: false})
+      },
+      resolve: async (_parent, args, ctx) => {
+        const scrollOptions = {
+          skip: 1,
+          cursor: {
+            id: args.cursor
+          }
+         }
+
+        let options = {
+          take: args.limit,
+          where: {
+            author: { id: args.authorId },
+            status: args.status,
+          },
+          orderBy: {
+            publishedAt: 'desc',
+          },
+        }
+
+        if (args.cursor) {
+          options = {...scrollOptions, ...options}
+        } 
+
+        return ctx.db.post.findMany(options)
       },
     })
 

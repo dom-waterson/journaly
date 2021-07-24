@@ -912,11 +912,12 @@ export type PostPageQuery = { __typename?: 'Query' } & {
 
 export type ProfilePageQueryVariables = Exact<{
   userId: Scalars['Int']
+  limit: Scalars['Int']
 }>
 
 export type ProfilePageQuery = { __typename?: 'Query' } & {
   userById: { __typename?: 'User' } & ProfileUserFragmentFragment
-  posts: Array<{ __typename?: 'Post' } & PostCardFragmentFragment>
+  infinatePosts: Array<{ __typename?: 'Post' } & PostCardFragmentFragment>
   currentUser?: Maybe<{ __typename?: 'User' } & UserWithLanguagesFragmentFragment>
 }
 
@@ -2511,11 +2512,11 @@ export type PostPageQueryResult = ApolloReactCommon.QueryResult<
   PostPageQueryVariables
 >
 export const ProfilePageDocument = gql`
-  query profilePage($userId: Int!) {
+  query profilePage($cursor: Int, $limit: Int!, $userId: Int!) {
     userById(id: $userId) {
       ...ProfileUserFragment
     }
-    posts(authorId: $userId, status: PUBLISHED) {
+    infinatePosts(cursor: $cursor, limit: $limit, authorId: $userId, status: PUBLISHED)  {
       ...PostCardFragment
     }
     currentUser {

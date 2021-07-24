@@ -1,9 +1,8 @@
-query profilePage($cursor: String, $limit: Int!, $userId: Int!) {
+query profilePage($cursor: Int, $limit: Int!, $userId: Int!) {
   userById(id: $userId) {
     ...ProfileUserFragment
   }
-  posts(cursor: $cursor, limit: $limit, authorId: $userId, status: PUBLISHED) {
-    cursor
+  infinatePosts(cursor: $cursor, limit: $limit, authorId: $userId, status: PUBLISHED) {
     ...PostCardFragment
   }
   currentUser {

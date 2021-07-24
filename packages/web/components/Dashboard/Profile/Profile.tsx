@@ -19,11 +19,12 @@ import PostList from './PostList'
 type ProfileTabsProps = {
   isLoggedInUser: boolean
   user: UserType
-  posts: PostCardType[]
+  posts: PostCardType[],
+  fetchMore: () => void
 }
 
 
-const ProfileTabs = ({ isLoggedInUser, user, posts}: ProfileTabsProps) => {
+const ProfileTabs = ({ isLoggedInUser, user, posts, fetchMore}: ProfileTabsProps) => {
   const { t } = useTranslation('profile')
   const tabs = [
     { key: 'posts', text: t('postsTitle') },
@@ -44,11 +45,14 @@ const ProfileTabs = ({ isLoggedInUser, user, posts}: ProfileTabsProps) => {
         </div>
 
         { activeKey === 'posts' && (
+          <>
           <PostList
             isLoggedInUser={isLoggedInUser}
             user={user}
             posts={posts}
           />
+          <button onClick={() => fetchMore()}>Load more</button>
+          </>
         )}
         { activeKey === 'stats' && (
           <ProfileStats userId={user.id} />
@@ -86,9 +90,10 @@ type Props = {
   isLoggedInUser: boolean
   user: UserType
   posts: PostCardType[]
+  fetchMore: () => void
 }
 
-const Profile: React.FC<Props> = ({ isLoggedInUser, user, posts }) => {
+const Profile: React.FC<Props> = ({ isLoggedInUser, user, posts, fetchMore }) => {
   return (
     <div className="profile-wrapper">
       <ProfileCard user={user} />
@@ -96,6 +101,7 @@ const Profile: React.FC<Props> = ({ isLoggedInUser, user, posts }) => {
         isLoggedInUser={isLoggedInUser}
         user={user}
         posts={posts}
+        fetchMore={fetchMore}
       />
 
       <style jsx>{`

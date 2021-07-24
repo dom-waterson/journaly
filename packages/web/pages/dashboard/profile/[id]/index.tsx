@@ -16,24 +16,34 @@ const ProfilePage: NextPage<InitialProps> = () => {
   const idStr = useRouter().query.id as string
   const userId = parseInt(idStr, 10)
 
-  const { data, loading, error, fetchMore } = useProfilePageQuery({ variables: { userId, limit: 5 } })
+  const { data, loading, error, fetchMore, updateQuery } = useProfilePageQuery({ variables: { userId, limit: 5 } })
 
-  const { userById, posts, currentUser } = data || {}
+  React.useState(data)
 
-  function fetchMorePosts() {
-    fetchMore({
+  const { userById, infinatePosts: posts, currentUser } = data || {}
+
+  async function fetchMorePosts() {
+    const fetchedMore = await fetchMore({
         variables: {
-          cursor: data?.posts.cursor
+          cursor: posts ? posts[posts.length - 1].id : null
         }
       })
 
+      updateQuery((previousResult) => {
+        console.log(previousResult)
+      return {
+        ...previousResult,
+        // @ts-ignore 
+        infinatePosts: [...previousResult.infinatePosts, ...fetchedMore.data.infinatePosts]
+      }})
+  
   }
 
   return (
     <LoadingWrapper loading={loading} error={error}>
       <DashboardLayout pad="never">
         {userById && posts && (
-          <Profile isLoggedInUser={currentUser?.id === userId} user={userById} posts={posts} fetchMorePosts={fetchMorePosts} />
+          <Profile isLoggedInUser={currentUser?.id === userId} user={userById} posts={posts} fetchMore={fetchMorePosts} />
         )}
       </DashboardLayout>
     </LoadingWrapper>
